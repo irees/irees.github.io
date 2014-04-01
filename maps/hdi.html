@@ -2,25 +2,147 @@
 <html>
 <head>
     <meta charset=utf-8 />
-    <title>A Simple Map</title> 
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+    <title>Human Development Index</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css" rel="stylesheet" />    
     <style>
       body { margin:0; padding:0; }
       #map { position:absolute; top:0; bottom:0; width:100%; }
+      .hdi-legend {
+          font-size: 8pt;
+          line-height: 150%;
+      }
+      .hdi-legend h1 {
+          font-size: 10pt;
+          padding: 5px;
+          border-bottom: solid 1px #999;
+          background: #eee;
+      }
+      .hdi-legend h2 {
+          margin: 0px;
+          margin-top: 10px;
+          font-size: 8pt;
+      }
+      .hdi-legend .legend-title {
+        text-align: left;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      .hdi-legend .legend-scale ul {
+        margin: 0;
+        padding: 0;
+        float: left;
+        list-style: none;
+      }
+      .hdi-legend .legend-scale ul li {
+        display: block;
+        float: left;
+        width: 28px;
+        margin-bottom: 6px;
+        text-align: center;
+        font-size: 80%;
+        list-style: none;
+      }
+      .hdi-legend ul.legend-labels li span {
+        display: block;
+        float: left;
+        height: 15px;
+        width: 28px;
+      }
+      .hdi-legend .legend-source {
+      }
+      .hdi-legend .legend-attr {
+        text-align: right;
+      }
+      .hdi-legend a {
+        color: #777;
+      }
+      .map-tooltip-content ul {
+          list-style: none;
+          margin: 0px;
+          padding: 0px;
+      }
+
     </style>
 </head>
     <body>
         <h1>HDI by census tract</h1>
-        <div id='map'>
+
+        <div id="grid-template">
+            <strong>{{label}}</strong>
+            <hr />
+            <ul>
+                <li><strong>HDI:</strong> {{hdi}}</li>
+                <li><strong>Population:</strong> {{pop}}</li>
+                <li><strong>Life Expectancy:</strong> {{le}}</li>
+                <li><strong>Income per-capita:</strong> {{income}}</li>
+                <li><strong>Mean years education:</strong> {{mys}}</li>
+                <li><strong>Expected years education:</strong> {{eys}}</li>
+            </ul>
+        </div>
+
+        <div id="hdi-legend-content" style="display: none;">
+            <div class="hdi-legend">
+                <h1>Human Development Index</h1>
+                <div class="legend-details">
+                    This map applies the <a href="http://hdr.undp.org/en/statistics/hdi">United Nations
+                    Development Programme Human Development Index (HDI)</a> -- a composite measure of Life
+                    Expectancy, Education, and Income levels -- to 74,133 census tracts in the United
+                    States. <a href="http://blog.ianrees.net">Additional details</a>.                    
+                </div>
+                <h2>HDI Deciles: Each color is 10% of population</h2>
+                <div class="legend-scale">
+                  <ul class="legend-labels">
+                    <li><span style="background:#9e0142;"></span>&gt; 0</li>
+                    <li><span style="background:#d53e4f;"></span>0.68</li>
+                    <li><span style="background:#f46d43;"></span>0.7</li>
+                    <li><span style="background:#fdae61;"></span>0.72</li>
+                    <li><span style="background:#fee08b;"></span>0.73</li>
+                    <li><span style="background:#e6f598;"></span>0.74</li>
+                    <li><span style="background:#abdda4;"></span>0.75</li>
+                    <li><span style="background:#66c2a5;"></span>0.76</li>
+                    <li><span style="background:#3288bd;"></span>0.78</li>
+                    <li><span style="background:#5e4fa2;"></span>0.79</li>
+                  </ul>
+                </div>
+                <div class="legend-source">Data: 
+                <a href="http://www.census.gov/acs/www/data_documentation/2012_release/">U.S. Census</a> and 
+                <a href="http://ghdx.healthmetricsandevaluation.org/record/united-states-adult-life-expectancy-state-and-county-1987-2009">Institute for Health Metrics and Evaluation</a>.
+                </div>
+                <p class="legend-attr">
+                <a href="http://twitter.com/woolie">@woolie</a><br>
+                <a href="http://ianrees.net">ianrees.net</a>
+                </p>
+            </div>
+        </div>
+
+        <div id="map">
+            <script src="http://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js"></script>        
             <script>
-            var map = L.mapbox.map('map', 'woolie.hllfng6j', {
-                'maxZoom': 11,
-                'zoom': 5,
-                'center': [39.232, -94.988]
+            var layer = "woolie.hllfng6j"            
+            var map = L.mapbox.map("map", null, {
+                "center": [37.195, -96.570],
+                "maxZoom": 11,
+                "zoom": 5,
             });
+            var tileLayer = L.mapbox.tileLayer(layer);
+            var gridLayer = L.mapbox.gridLayer(layer);
+            map.addLayer(tileLayer);
+            map.addLayer(gridLayer);
+
+            var hash = L.hash(map);
+            
+            var gridControl = L.mapbox.gridControl(gridLayer);
+            gridControl.setTemplate(document.getElementById("grid-template").innerHTML);
+            map.addControl(gridControl);
+
+            var legendControl = L.mapbox.legendControl();
+            legendControl.addLegend(document.getElementById("hdi-legend-content").innerHTML);
+            map.addControl(legendControl);
             </script>
         </div>
+
+
     </body>
 </html>
