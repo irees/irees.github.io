@@ -1,152 +1,322 @@
+<html>
+<head>
+    <title>Human Development Index</title>
+</head>
+<body>
+    
+<div style="width:800px;margin-left:auto;margin-right:auto">
 <h1>Human Development Index, applied to U.S. Census Tracts</h1>
 
-<h2><a href="hdi.html">View the map!</a></h2>
-<h2><a href="https://github.com/irees/cityism/blob/master/query_hdi.py">View the code!</a></h2>
+<iframe src="hdi.html" width="100%" height="600px" frameborder="1"></iframe>
+
+<h2><a href="hdi.html">View the map!</a> <a href="https://github.com/irees/cityism/blob/master/query_hdi.py">View the code!</a></h2>
 
 <p>In a recent twitter discussion with 
-@markasaurus @MBridegam and @evanlandman 
+<a href="https://twitter.com/markasaurus">@markasaurus</a>, <a href="https://twitter.com/MBridegam">@MBridegam</a> and <a href="https://twitter.com/evanlandman">@evanlandman</a>
 about <a href="http://ispol.com/sasha/hdi/">Alexandr Trubetskoy's map of U.S. counties by Human Development Index</a>,
 we wondered if it would be possible to perform the HDI calculation at a lower level for a more fine grained look at the invisible dividing lines in American cities. The spatial inequality of the US is complicated, the result of centuries of investment and disinvestment, racial covenants, restrictive zoning, environmental degradation, loss of manufacturing jobs, redlining, transportation infrastructure, and thousands of other factors; but can the three components of the HDI -- Income, Education, and Life Expectancy -- capture these differences in a more subtle way than a single Census survey question?</p>
 
-<h2>The Human Development Index</h2>
+<h2>Calculating the Human Development Index</h2>
 
-<p>The <a href="http://irees.github.io/maps/hdi_details.html">United Nation's Development Programme Human Development Index (HDI)</a> is a composite measure of Life Expectancy, Education, and Income levels. It is commonly used to provide a single value for comparing development levels between different countries, but can also be "disaggregated" to look at relative differences within a single country, administrative region, ethnic group, gender, etc.</p>
+<p>The <a href="http://hdr.undp.org/en/statistics/hdi">United Nation's Development Programme Human Development Index (HDI)</a> is a composite measure of Life Expectancy, Education, and Income levels. It is commonly used to provide a single value for comparing development levels between different countries, but can also be "disaggregated" to look at relative differences within a single country, administrative region, ethnic group, gender, etc.</p>
 
 <p>The <a href="http://hdr.undp.org/sites/default/files/hdr_2013_en_technotes.pdf">HDI is calculated</a> as value from 0.0 to 1.0, where 1.0 is the highest possible level of development, and is the geometric mean of the three component indices described below.</p>
 
-<h3>Income Index</h3>
+<p>The <strong>Income Index (II)</strong> is the simplest of the three component indices, and is based on the Gross National Income per capita (GNIpc). The value is normalized between the minimum and maximum observed incomes, using a logarithmic scale to reflect the decreasing importance of marginal income near the max. For example, if the observed min and max GNIpc were $100 and $87,478 respectively, a GNIpc of $50,000 would be: 
+</p>
 
-<p>The Income Index (II) is the simplest of the three component indices, and is based on the Gross National Income per capita (GNIpc). The value is normalized between the minimum and maximum observed incomes, using a logarithmic scale to reflect the decreasing importance of marginal income near the max. For example, if the observed min and max GNIpc were $100 and $107,721 respectively, a GNIpc of $50,000 would be: (ln(50000)-ln(100))/(ln(107721)-ln(100)), or 0.890. In the United States, the GNIpc ranges from ?? to ?? in ??? County (<a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B19301&prodType=table">ACS 2012 5-yr table B19301</a>).</p>
+<blockquote>
+    (ln(income) - ln(income_min)) / (ln(income_max) - ln(income_min))<br />
+    = (ln(50000) - ln(100)) / (ln(87478)-ln(100))<br />
+    = 0.917
+</blockquote>
 
-<h3>Life Expectancy Index</h3>
+<p>The <strong>Life Expectancy Index (LEI)</strong> is based on the life expectancy at birth (LE), normalized between the highest and lowest observed life expectancy values. If the observed min and max were 20 years and 83.57 years respectively, a LE of 55 years would result in an LEI of:
+</p>
 
-<p>The Life Expectancy Index (LEI) is based on the life expectancy at birth (LE), normalized between the highest and lowest observed life expectancy values. For instance, if the observed min and max were 20 years and 83.57 years respectively, a LE of 55 years would result in an LEI of (55-20)/(83.57-20), or 0.551. The <a href="http://www.healthmetricsandevaluation.org/">Institute for Health Metrics and Evaluation</a> <a href="http://ghdx.healthmetricsandevaluation.org/record/united-states-adult-life-expectancy-state-and-county-1987-2009">publishes LE estimates</a> (1987-2009) for each county in the United States. LE estimates for each Census tract would be preferable, but this data is only available for a few counties (such as <a href="http://www.societyhealth.vcu.edu/Page.aspx?nav=204">Alameda County, CA</a>) where deaths have been geocoded to exact locations. In the IMHE data, the min observed LE is 70.2 years in McDowell County, WV and the max is 83.35 years in Marin County, CA. However, even Marin is lower than Japan's current national LE of <a href="http://en.wikipedia.org/wiki/List_of_countries_by_life_expectancy">84.6 years</a>! While my original calculation used 70.2 years as the lower bound, I lowered it to 50 years (close to the current observed global min of 47.5 years in Sierra Leone) to give slightly less weight to the LEI component. Note that because I only have county-level data, you may see interesting artifacts in places such as Baltimore, MD, and Dallas, TX.</p>
+<blockquote>
+    (le - le_min) / (le_max - le_min)<br /> 
+    = (55 - 20) / (83.6 - 20)<br /> 
+    = 0.550
+</blockquote>
 
-<h3>Education Index</h3>
+<p>The <strong>Education Index (EI)</strong> is the most complex of the three components, and is itself a composite of <a href="http://www.uis.unesco.org/Education/Documents/mean-years-schooling-indicator-methodology-en.pdf">mean years of schooling</a> of adults over 25 years old (MYS) and <a href="http://www.nber.org/papers/w15902.pdf">expected years of schooling</a> for children entering school age (EYS).</p>
 
-<p>The third HDI component is the Education Index (EI), a measure combining <a href="http://www.uis.unesco.org/Education/Documents/mean-years-schooling-indicator-methodology-en.pdf">mean years of schooling</a> of adults over 25 years old (MYS) and <a href="http://www.nber.org/papers/w15902.pdf">expected years of schooling</a> for children entering school age (EYS).</p>
+<p>Mean years of schooling can be calculated relatively easily using data on educational attainment. Each level of educational attainment is assigned a duration in years, and multiplied by the percentage of the population over 25 years old that completed that level. For example, if 60% of the population completed high-school (13 years), 20% completed an undergraduate degree (17 years), and 5% completed an M.D. (21 years), the MYS would be:
+</p>
+    
+<blockquote>
+    sum(level_completed_ratio * level_duration) for each level<br />
+    = (0.6 * 13) + (0.2 * 17) + (0.05 * 21)<br />
+    = 12.25
+</blockquote>
+    
+<p>Expected years of schooling is the number of years of education a child entering school today would be expected to complete. Ideally, it should be calculated by following a single group of students over time. Alternatively, we can estimate the value using Census data on school enrollment. If we had 100% enrollment through 8th grade (9 years), 70% enrollment in 9th-12th grade (+4 years), and 20% undergraduate enrollment (+4 years), then the EYS would be:
+</p>
+    
+<blockquote>
+    sum(level_enrollment_ratio * level_duration) for each level<br />
+    = (1.0 * 9) + (0.7 * 4) + (0.2 * 4)<br />
+    = 12.6
+</blockquote>
 
-<p>Calculating MYS is fairly straight-forwarding using the Census data for educational attainment for the population 25 years and over (<a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B15003&prodType=table">ACS 2012-5yr table B15003</a>). Each attainment level is assigned a duration (e.g. 14 years for high-school, 18 years for undergraduate degree), and multiplied by the percentage of the population with that attainment. The MYS is then the sum of all levels. For instance, if 50% of the population has a high-school dipolma and 50% has a bachelor's degree, the result is (14*0.5)+(18*0.5), or 16 years. Note that I imagined an idealized world with universal Pre-K and Kindergarten.</p>
+<p>The EI is the geometric mean of the normalized MYS and EYS values:</p>
+    
+<blockquote>
+    EImys = (mys - mys_min) / (mys_max - mys_min)<br />
+    EIeys = (eys - eys_min) / (eys_max - eys_min)<br />
+    EI = ((EImys * EIeys)**0.5 - EImin) / (EImax - EImin)
+</blockquote>
 
-<p>Ideally, the EYS is the expected years of school for a child entering school age, and is calculated using the continuation rates for each subsequent level of school. I used the Census data for school enrollment by level of school for population 3 years and older (<a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B14001&prodType=table">ACS 2012-5yr table B14001</a>), combined with sex by age (<a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B01001&prodType=table">ACS 2012-5yr table B01001</a>) to calculate enrollment ratios for each grade. However, I did run into some issues with this calculation; the categories in the two tables did not perfectly line up, and grade school enrollment ratios can be mysteriously low in some places. The initial result wasn't much better than random, so I limited my comparison to only 9th-12th grades, college, and graduate school. For example, a tract where 100% of the relevant population is enrolled in k-8 (9 years, assumed), 90% for 9th-12th grades (4 years), 50% for college (4 years), and 10% for graduate school (5 years) would have an EYS of (1.0*9)+(0.9*4)+(0.5*4)+(0.1*5), or 15.1 years. The UN HDI caps EYS at 18-years; this mostly affects areas immediately adjacent to Universities.</p>
+<p>And assuming a minimum of 0 years for all values, a maximum MYS of 13.3 years (United States), and a maximum EYS of 18 years, and a global maximum EI of 0.971 (New Zealand) using the previous values above:
+</p>
+     
+<blockquote>
+    EImys = (12.25 - 0) / (13.3 - 0) = 0.921<br />
+    EIeys = (12.6 - 0) / (18.0 - 0) = 0.7<br />
+    EI = ((0.921 * 0.7)**0.5 - 0) / (0.971 - 0)<br />
+    = 0.827
+</blockquote>
+    
+<p>And finally, the <strong>HDI</strong> is the geometric mean of the EI, II, and LEI:
+</p>
 
-<p>Finally, the EI is the resulting geometric mean of (MYS / max MYS) and (EYS / max EYS). If EYS was 15.1 with a max EYS of 18, and the MYS was 16 with a max MYS of 22, then the EI would be: ((15.1/18)*(16/22))**0.5, or 0.781.</p>
+<blockquote>
+    (II * LEI * EI)**(1/3.0)<br />
+    = (0.890 * 0.551 * 0.827)**(1/3.0)<br />
+    = 0.740
+</blockquote>
 
-<h3>Final HDI</h3>
+<h2>Data</h2>
 
-<p>The final HDI is the geometric mean of EI, II, and LEI, or (EI*II*LEI)**(1/3.0).</p>
+<p>The map collected data from 72,730 tracts in 50 states from the <a href="https://www.census.gov/acs/www/data_documentation/2012_release/">American Community Survey 2012-5year data release.</a></p>
 
-<h2>Results</h2>
+<p>Income data was collected from <a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B19301&prodType=table">per-capita income in the past 12 months (in 2012 inflation-adjusted dollars)</a>. This data was used directly.</p>
+    
+<p>Mean years of schooling was calculated using <a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B15003&prodType=table">educational attainment for the population 25 years and over</a> and <a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B01001&prodType=table">sex by age</a> for the number of people over 25 years old. Education durations were assigned to each attainment level, and divided by the population over 25 as described above.
+</p>
 
-<p>Blah blah blah.</p>
+<p>Expected years of schooling was more complicated, <a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B14001&prodType=table">using school enrollment by level of school for population 3 years and older</a>. Again, an education duration was assigned to each level, and matched up with corresponding age groups from the <a href="http://factfinder2.census.gov/faces/tableservices/jsf/pages/productview.xhtml?pid=ACS_12_5YR_B01001&prodType=table">sex by age</a> table. Initial results were noisy at the grade school level, so education through 8th grade was assumed, and EYS calculated using enrollment ratios for 9th-12th grade, undergraduate, and graduate school. The UN HDI caps EYS at 18-years; this mostly affects areas immediately adjacent to Universities.
+</p>    
 
-HDI:
-min: 0.342 max: 0.799 pop: 30866426.0 aland: 1331246.15544, Croatia
-min: 0.799 max: 0.828 pop: 30892004.0 aland: 1743121.42309, Hungary
-min: 0.828 max: 0.847 pop: 30893989.0 aland: 1282143.68712, Estonia
-min: 0.847 max: 0.863 pop: 30890478.0 aland: 1420318.01055, Greece
-min: 0.863 max: 0.877 pop: 30895463.0 aland: 1007056.122, United Kingdom
-min: 0.877 max: 0.891 pop: 30896503.0 aland: 910700.900381, Finland
-min: 0.891 max: 0.905 pop: 30893544.0 aland: 652633.180561, Iceland
-min: 0.905 max: 0.92 pop: 30891005.0 aland: 360651.668147, Germany
-min: 0.92 max: 0.938 pop: 30890851.0 aland: 216588.255504, Australia
-min: 0.938 max: 0.999 pop: 30891306.0 aland: 127534.550259, Norway
-
-EI:
-min: 0.112 max: 0.753 pop: 30869950.0 aland: 1701644.12368
-min: 0.753 max: 0.808 pop: 30892065.0 aland: 1657684.36049
-min: 0.808 max: 0.845 pop: 30891290.0 aland: 1214951.46696
-min: 0.845 max: 0.875 pop: 30893789.0 aland: 1135281.58635
-min: 0.875 max: 0.903 pop: 30892110.0 aland: 907323.696462
-min: 0.903 max: 0.931 pop: 30896985.0 aland: 836483.034051
-min: 0.931 max: 0.958 pop: 30892512.0 aland: 527508.969648
-min: 0.958 max: 0.987 pop: 30892659.0 aland: 395193.655362
-min: 0.987 max: 1.0 pop: 30891097.0 aland: 301470.346444
-min: 1.0 max: 1.0 pop: 30890372.0 aland: 374452.923719
-
-LEI:
-min: 0.789 max: 0.877 pop: 30894901.0 aland: 1161985.97122
-min: 0.877 max: 0.893 pop: 30911828.0 aland: 989821.576702
-min: 0.893 max: 0.906 pop: 30913172.0 aland: 1015031.75609
-min: 0.906 max: 0.913 pop: 30912924.0 aland: 1165487.14415
-min: 0.913 max: 0.917 pop: 30913879.0 aland: 1973077.96886
-min: 0.917 max: 0.93 pop: 30915849.0 aland: 1514651.18506
-min: 0.93 max: 0.94 pop: 30911772.0 aland: 662553.03956
-min: 0.94 max: 0.951 pop: 30911878.0 aland: 305541.703167
-min: 0.951 max: 0.958 pop: 30914492.0 aland: 141486.181901
-min: 0.958 max: 0.996 pop: 30913563.0 aland: 131682.393905
-
-II:
-min: 0.13 max: 0.736 pop: 30892791.0 aland: 705267.364979
-min: 0.736 max: 0.767 pop: 30913461.0 aland: 943943.238139
-min: 0.767 max: 0.786 pop: 30913249.0 aland: 1438401.14042
-min: 0.786 max: 0.801 pop: 30913862.0 aland: 1429640.65463
-min: 0.801 max: 0.816 pop: 30912243.0 aland: 1752456.49969
-min: 0.816 max: 0.831 pop: 30915233.0 aland: 1064444.56382
-min: 0.831 max: 0.848 pop: 30913019.0 aland: 680070.34513
-min: 0.848 max: 0.868 pop: 30914649.0 aland: 541891.938723
-min: 0.868 max: 0.898 pop: 30912883.0 aland: 354210.103431
-min: 0.898 max: 1.0 pop: 30911608.0 aland: 150992.86154
-
-EYS:
-min: 9.0 max: 14.483 pop: 30892200.0 aland: 2227455.92093
-min: 14.483 max: 15.09 pop: 30913355.0 aland: 1436743.21306
-min: 15.09 max: 15.557 pop: 30915075.0 aland: 1169313.96017
-min: 15.557 max: 15.98 pop: 30914743.0 aland: 1006600.87302
-min: 15.98 max: 16.405 pop: 30913476.0 aland: 842959.931792
-min: 16.405 max: 16.846 pop: 30917156.0 aland: 826448.182303
-min: 16.846 max: 17.284 pop: 30913569.0 aland: 496256.500254
-min: 17.284 max: 17.785 pop: 30914659.0 aland: 376214.503521
-min: 17.785 max: 18.0 pop: 30912391.0 aland: 311916.896631
-min: 18.0 max: 18.0 pop: 30917091.0 aland: 376594.288825
-
-MYS:
-min: 4.444 max: 12.603 pop: 30887487.0 aland: 697192.895877
-min: 12.603 max: 13.225 pop: 30914525.0 aland: 1729794.41978
-min: 13.225 max: 13.606 pop: 30915071.0 aland: 1238392.84465
-min: 13.606 max: 13.917 pop: 30912323.0 aland: 1428616.40374
-min: 13.917 max: 14.22 pop: 30914996.0 aland: 1455950.05269
-min: 14.22 max: 14.544 pop: 30912618.0 aland: 1177675.22028
-min: 14.544 max: 14.924 pop: 30911770.0 aland: 697016.162632
-min: 14.924 max: 15.402 pop: 30915433.0 aland: 352369.831988
-min: 15.402 max: 16.093 pop: 30913664.0 aland: 205592.329485
-min: 16.093 max: 22.0 pop: 30917297.0 aland: 85918.61607
-
-LE:
-min: 70.2 max: 75.75 pop: 30884653.0 aland: 1157474.21178
-min: 75.75 max: 76.8 pop: 30916694.0 aland: 995012.40274
-min: 76.8 max: 77.6 pop: 30912954.0 aland: 984232.748855
-min: 77.6 max: 78.05 pop: 30916023.0 aland: 1196160.45281
-min: 78.05 max: 78.35 pop: 30913598.0 aland: 1952937.52472
-min: 78.35 max: 79.15 pop: 30912592.0 aland: 1536898.65999
-min: 79.15 max: 79.8 pop: 30920733.0 aland: 666120.344127
-min: 79.8 max: 80.5 pop: 30916406.0 aland: 306027.989558
-min: 80.5 max: 80.95 pop: 30915975.0 aland: 144121.571671
-min: 80.95 max: 83.35 pop: 30914087.0 aland: 131518.364267
-
-Income:
-min: 16.0 max: 14678.0 pop: 30892517.0 aland: 705193.964828
-min: 14678.0 max: 17987.0 pop: 30915703.0 aland: 944842.435379
-min: 17987.0 max: 20491.0 pop: 30917736.0 aland: 1452536.52516
-min: 20491.0 max: 22782.0 pop: 30913585.0 aland: 1415316.72692
-min: 22782.0 max: 25145.0 pop: 30913954.0 aland: 1752962.2727
-min: 25145.0 max: 27862.0 pop: 30912945.0 aland: 1045088.61083
-min: 27862.0 max: 31261.0 pop: 30914380.0 aland: 702619.401599
-min: 31261.0 max: 35856.0 pop: 30915533.0 aland: 540753.844767
-min: 35856.0 max: 43885.0 pop: 30912841.0 aland: 352575.294162
-min: 43885.0 max: 252908.0 pop: 30913538.0 aland: 150264.263091
-
-Pop:
-min: 2.0 max: 2719.0 pop: 30886678.0 aland: 3322373.71188
-min: 2719.0 max: 3371.0 pop: 30913546.0 aland: 1470278.92916
-min: 3371.0 max: 3888.0 pop: 30914994.0 aland: 813809.679544
-min: 3888.0 max: 4366.0 pop: 30914534.0 aland: 807550.321405
-min: 4366.0 max: 4842.0 pop: 30915061.0 aland: 573146.770535
-min: 4842.0 max: 5353.0 pop: 30913492.0 aland: 489983.587445
-min: 5353.0 max: 5939.0 pop: 30914595.0 aland: 476791.386605
-min: 5939.0 max: 6655.0 pop: 30914427.0 aland: 372615.229496
-min: 6655.0 max: 7724.0 pop: 30916811.0 aland: 391325.368154
-min: 7724.0 max: 39143.0 pop: 30919577.0 aland: 352629.286289
+<p>The <a href="http://www.healthmetricsandevaluation.org/">Institute for Health Metrics and Evaluation</a> <a href="http://ghdx.healthmetricsandevaluation.org/record/united-states-adult-life-expectancy-state-and-county-1987-2009">publishes LE estimates</a> (1987-2009) for each county in the United States. LE estimates for each Census tract would be preferable, but this data is only available for a few counties (such as <a href="http://www.societyhealth.vcu.edu/Page.aspx?nav=204">Alameda County, CA</a>) where deaths have been geocoded to exact locations. Note that because I only have county-level data, you may see interesting artifacts in places such as Baltimore, MD.
+</p>
 
 
+<h2>Goalposts</h2>
 
+<p>As described above, each component of the HDI is normalized to the global observed min and max values. A study could select global goalposts, or local values from the region being studied. I experimented with both approaches, and decided to use the global goalposts from the 2013 UN HDI. Note: In any instance where an individual HDI component exceeded 1.0, it was capped at 1.0. This happened most commonly with the Education Index near college towns, and in some very high income Census tracts.</p>
+    
+<table>
+    <thead>
+        <tr>
+            <th />
+            <th>Global Min</th>
+            <th>Global Max</th>
+            <th>US Min</th>
+            <th>US Max</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Income</td>
+            <td>$100</td>
+            <td>$87,478 (Qatar)</td>
+            <td>$16 </td>
+            <td>$252,908 (in Manhattan)</td>
+        </tr>
+        <tr>
+            <td>Life Expectancy</td>
+            <td>20</td>
+            <td>83.6 (Japan)</td>
+            <td>70.2</td>
+            <td>83.4 (Marin County, CA)</td>
+        </tr>
+        <tr>
+            <td>Mean years of schooling</td>
+            <td>0</td>
+            <td>13.3 (United States)</td>
+            <td>4.4</td>
+            <td>19.6 (Virginia Tech campus)</td>
+        </tr>
+        <tr>
+            <td>Expected years of schooling</td>
+            <td>0</td>
+            <td>18.0 (Capped)</td>
+            <td>9.0</td>
+            <td>18.0 (Common)</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    <strong>Sanity check:</strong> I was initially concerned that my attempts to map American Community Survey data to the UN's HDI data would be wildly off, but in the end the median values were not too far off from the published UN HDI values. The differences may be that I used <em>median</em> income per-capita instead of <em>average</em> income per capita, and I may have counted an extra year of expected schooling (kindergarten?). As such, the values for an individual Census tract may give a rough "feel" for comparing against the published HDI of another country, but exact comparisons are unlikely to be useful.
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th />
+            <th>My value</th>
+            <th>Published</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Median income per capita</td>
+            <td>$25,145</td>
+            <td>$26,364 (<a href="http://www.ssa.gov/cgi-bin/netcomp.cgi?year=2010">SSI, 2010</a>)</td>
+        </tr>
+
+        <tr>
+            <td>Life Expectancy</td>
+            <td>78.35</td>
+            <td>78.7 (<a href="http://hdr.undp.org/en/countries/profiles/USA">UN</a>)</td>
+        </tr>
+        <tr>
+            <td>Mean years of schooling</td>
+            <td>14.22</td>
+            <td>13.3 (<a href="http://hdr.undp.org/en/countries/profiles/USA">UN</a>)</td>
+        </tr>
+        <tr>
+            <td>Expected years of schooling</td>
+            <td>16.4</td>
+            <td>16.8 (<a href="http://hdr.undp.org/en/countries/profiles/USA">UN</a>)</td>
+        </tr>
+
+        <tr>
+            <td>HDI</td>
+            <td>0.877 (median)</td>
+            <td>0.937 (<a href="http://hdr.undp.org/en/countries/profiles/USA">UN, average</a>)</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<h2>The Map</h2>
+
+<p>The map shows all 72,730 tracts, of which I was able to calculate an HDI for 72,216 tracts (exclude zero population, missing data, etc). The tracts are colored by the relative HDI within the United States. The colors are chosen such that 10% of the population, about 31 million people, live within each color. Incomes tend to be lower in rural areas than highly urbanized areas, so the immediate impression is that vast areas of the United States are relatively undeveleoped.
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>HDI range</th>
+            <th> - </th>
+            <th>Population</th>
+            <th>Land area (km^2)</th>
+            <th>Land area %</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>0.0</td>
+            <td>0.799</td>
+            <td>30,866,426</td>
+            <td>1,331,246</td>
+            <td>14.6%</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>0.799</td>
+            <td>0.828</td>
+            <td>30,892,004</td>
+            <td>1,743,121</td>
+            <td>19.2%</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>0.828</td>
+            <td>0.847</td>
+            <td>30,893,989</td>
+            <td>1,282,143</td>
+            <td>14.1%</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>0.847</td>
+            <td>0.863</td>
+            <td>30,890,478</td>
+            <td>1,420,318</td>
+            <td>15.6%</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>0.863</td>
+            <td>0.877</td>
+            <td>30,895,463</td>
+            <td>1,007,056</td>
+            <td>11.1%</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>0.877</td>
+            <td>0.891</td>
+            <td>30,896,503</td>
+            <td>910,700</td>
+            <td>10.0%</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>0.891</td>
+            <td>0.905</td>
+            <td>30,893,544</td>
+            <td>652,633</td>
+            <td>7.2%</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>0.905</td>
+            <td>0.920</td>
+            <td>30,891,005</td>
+            <td>360,651</td>
+            <td>4.0%</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>0.920</td>
+            <td>0.938</td>
+            <td>30,890,851</td>
+            <td>216,588</td>
+            <td>2.4%</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>0.938</td>
+            <td>1.00</td>
+            <td>30,891,306</td>
+            <td>127,534</td>
+            <td>1.4%</td>
+        </tr>
+        
+        
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+
+</div>
+</body>
+</html>
