@@ -195,15 +195,16 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 
 <h2>The Map</h2>
 
-<p>The map shows all 72,730 tracts, of which I was able to calculate an HDI for 72,216 tracts (exclude zero population, missing data, etc). The tracts are colored by the relative HDI within the United States. The colors are chosen such that 10% of the population, about 31 million people, live within each color. Incomes tend to be lower in rural areas than highly urbanized areas, so the immediate impression is that vast areas of the United States are relatively undeveleoped.
+<p>The map shows all 72,730 tracts, of which I was able to calculate an HDI for 72,216 tracts (exclude zero population, missing data, etc). The tracts are colored by the relative HDI within the United States. The colors are chosen such that 10% of the population, about 31 million people, live within each color. Incomes tend to be lower in rural areas than highly urbanized areas, so the immediate impression is that vast areas of the United States are relatively undeveleoped. However, zoom in to a metropolitan area and you can see the highly concentrated pockets of wealth, typically in first-ring suburbs and exurban areas.
 </p>
 
+<p><strong>Map statistics:</strong></p>
 <table>
     <thead>
         <tr>
             <th>Group</th>
-            <th>HDI range</th>
-            <th> - </th>
+            <th>HDI min</th>
+            <th>HDI max </th>
             <th>Population</th>
             <th>Land area (km^2)</th>
             <th>Land area %</th>
@@ -212,7 +213,7 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
     <tbody>
         <tr>
             <td>1</td>
-            <td>0.0</td>
+            <td>0.342</td>
             <td>0.799</td>
             <td>30,866,426</td>
             <td>1,331,246</td>
@@ -295,23 +296,14 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
     </tbody>
 </table>
 
+<h2>Future work</h2>
+
+<p>Well, this was first "real" map I've made using Census data, PostGIS, TileMill, Mapbox, etc. It was a learning experience as much as interest in answering the original question. Please feel free to send any comments my way on twitter, <a href="https://twitter.com/woolie">@woolie</a>. In the likely event I've made a terrible error or oversight, I'd love to hear your thoughts!</p>
+
+<p>Finally, here is the <a href="https://github.com/irees/cityism/blob/master/query_hdi.py">code I used to generate the map</a>, and a <a href="">CSV export</a> of all the attributes I calculated.</p>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-<br />
 <br />
 <br />
 <br />

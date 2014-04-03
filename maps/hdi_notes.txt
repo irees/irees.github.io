@@ -1,3 +1,6 @@
+['geoid', 'gid', 'countyfp', 'statefp', 'name', 'label', 'pop', 'aland', 'awater', 'hdi', 'ii', 'ei', 'lei', 'income', 'mys', 'eys', 'le']
+
+
 EYS:
 min: 9.0 max: 14.483 pop: 30892200.0 aland: 2227455.92093
 min: 14.483 max: 15.09 pop: 30913355.0 aland: 1436743.21306
