@@ -1,20 +1,9 @@
-<html>
-<head>
-    <title>Human Development Index</title>
-</head>
-<body>
-    
-<div style="width:800px;margin-left:auto;margin-right:auto">
-<h1>Human Development Index, applied to U.S. Census Tracts</h1>
-
-<iframe src="hdi.html" width="100%" height="600px" frameborder="1"></iframe>
-
-<h2><a href="hdi.html">View the map!</a>
+![](https://31.media.tumblr.com/9396430b0d588a53b251a74798449016/tumblr_inline_n3fj8mGr241qb7ghq.png)<h2><a href="http://pages.ianrees.net/maps/hdi.html">View the interactive map!</a></h2>
 
 <p>In a recent twitter discussion with 
 <a href="https://twitter.com/markasaurus">@markasaurus</a>, <a href="https://twitter.com/MBridegam">@MBridegam</a> and <a href="https://twitter.com/evanlandman">@evanlandman</a>
 about <a href="http://ispol.com/sasha/hdi/">Alexandr Trubetskoy's map of U.S. counties by Human Development Index</a>,
-we wondered if it would be possible to perform the HDI calculation at a lower level for a more fine grained look at the invisible dividing lines in American cities. The spatial inequality of the US is complicated, the result of centuries of investment and disinvestment, racial covenants, restrictive zoning, environmental degradation, loss of manufacturing jobs, redlining, transportation infrastructure, and thousands of other factors; but can the three components of the HDI -- Income, Education, and Life Expectancy -- capture these differences in a more subtle way than a single Census survey question?</p>
+we wondered if it would be possible to perform the HDI calculation at a lower level for a more fine grained look at the invisible dividing lines in American cities. The spatial inequality of the US is complicated, the result of centuries of investment and disinvestment, legacy of slavery, racial covenants, restrictive zoning, environmental degradation, loss of manufacturing jobs, redlining, transportation infrastructure, and thousands of other factors; but can the three components of the HDI -- Income, Education, and Life Expectancy -- capture these differences in a more subtle way than a single Census survey question?</p>
 
 <h2>Calculating the Human Development Index</h2>
 
@@ -46,7 +35,7 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 </p>
     
 <blockquote>
-    sum(level_completed_ratio * level_duration) for each level<br />
+    sum(level_completed_ratio * level_duration for each level)<br />
     = (0.6 * 13) + (0.2 * 17) + (0.05 * 21)<br />
     = 12.25
 </blockquote>
@@ -55,7 +44,7 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 </p>
     
 <blockquote>
-    sum(level_enrollment_ratio * level_duration) for each level<br />
+    sum(level_enrollment_ratio * level_duration for each level)<br />
     = (1.0 * 9) + (0.7 * 4) + (0.2 * 4)<br />
     = 12.6
 </blockquote>
@@ -150,7 +139,7 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 </table>
 
 <p>
-    <strong>Sanity check:</strong> I was initially concerned that my attempts to map American Community Survey data to the UN's HDI data would be wildly off, but in the end the median values were not too far off from the published UN HDI values. The differences may be that I used <em>median</em> income per-capita instead of <em>average</em> income per capita, and I may have counted an extra year of expected schooling (kindergarten?). As such, the values for an individual Census tract may give a rough "feel" for comparing against the published HDI of another country, but exact comparisons are unlikely to be useful.
+    <strong>Sanity check:</strong> I was initially concerned that my attempts to map American Community Survey data to the UN's HDI data would be wildly off, but in the end the median values were not too far off from the published UN HDI values. The differences may be that I used a different measure of per-capita income, and I may have counted an extra year of expected schooling (kindergarten?). As such, the values for an individual Census tract may give a rough "feel" for comparing against the published HDI of another country, but exact comparisons are unlikely to be useful. Please limit comparisons to within this map.
 </p>
 
 <table>
@@ -195,7 +184,7 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 
 <h2>The Map</h2>
 
-<p>The map shows all 72,730 tracts, of which I was able to calculate an HDI for 72,216 tracts (exclude zero population, missing data, etc). The tracts are colored by the relative HDI within the United States. The colors are chosen such that 10% of the population, about 31 million people, live within each color. Incomes tend to be lower in rural areas than highly urbanized areas, so the immediate impression is that vast areas of the United States are relatively undeveleoped. However, zoom in to a metropolitan area and you can see the highly concentrated pockets of wealth, typically in first-ring suburbs and exurban areas.
+<p>The map shows all 72,730 tracts, of which I was able to calculate an HDI for 72,216 tracts (exclude zero population, missing data, etc). The tracts are colored by the relative HDI within the United States. The colors are chosen such that 10% of the population, about 31 million people, live within each color. Incomes tend to be lower in rural areas than highly urbanized areas, so the immediate impression is that vast areas of the United States are relatively undeveloped. However, zoom in to a metropolitan area and you can see the highly concentrated pockets of wealth, typically in first-ring suburbs and exurban areas.
 </p>
 
 <p><strong>Map statistics:</strong></p>
@@ -298,17 +287,8 @@ we wondered if it would be possible to perform the HDI calculation at a lower le
 
 <h2>Future work</h2>
 
-<p>Well, this was first "real" map I've made using Census data, PostGIS, TileMill, Mapbox, etc. It was a learning experience as much as interest in answering the original question. Please feel free to send any comments my way on twitter, <a href="https://twitter.com/woolie">@woolie</a>. In the likely event I've made a terrible error or oversight, I'd love to hear your thoughts!</p>
+<p>Well, this was first "real" map I've made using Census data, PostGIS, TileMill, Mapbox, etc. It was a learning experience as much as interest in answering the original question. I'll be looking into what demographic factors not included in the HDI calculation are correlated with HDI, where the lines of greatest HDI contrast, and the relationship between population density and HDI.</p>
+
+<p>Please feel free to send any comments my way on twitter, <a href="https://twitter.com/woolie">@woolie</a>. In the very likely event I've made a terrible error or oversight, I'd love to hear your thoughts!</p>
 
 <p>Finally, here is the <a href="https://github.com/irees/cityism/blob/master/query_hdi.py">code I used to generate the map</a>, and a <a href="http://pages.ianrees.net/maps/hdi.csv">CSV export</a> of all the attributes I calculated.</p>
-
-
-
-<br />
-<br />
-<br />
-<br />
-
-</div>
-</body>
-</html>
