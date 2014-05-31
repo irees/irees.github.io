@@ -61,9 +61,9 @@
           return {color: '#ff3c00'}
         }
         
-        var jsonTest = new L.GeoJSON.AJAX(["http://pages.ianrees.net/maps/vta/vta.geojson"],{style:style, onEachFeature:popUp}).addTo(map);
-        var jsonTest = new L.GeoJSON.AJAX(["http://pages.ianrees.net/maps/vta/caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
-        var jsonTest = new L.GeoJSON.AJAX(["http://pages.ianrees.net/maps/vta/bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
+        var jsonTest = new L.GeoJSON.AJAX(["vta.geojson"],{style:style, onEachFeature:popUp}).addTo(map);
+        var jsonTest = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
+        var jsonTest = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
         console.log(jsonTest);
 
       </script>
