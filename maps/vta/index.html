@@ -36,7 +36,7 @@
                 results = regex.exec(location.search);
             return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
-        var headway_key = get_qs('headway') || 'headway_peak';
+        var headway_key = get_qs('headway') || 'headway_median';
     
         // Color gradient
         var colormap = d3.scale.linear().domain([0,0.3]).range(['white','blue'])
@@ -82,9 +82,9 @@
           if (headway <= 900) {
             return {color: "#0011ff", weight: 2.5, opacity: 1.0}
           } else if (headway < 2000) {
-            return {color: "#ce69db", weight: 2.5, opacity: 0.5}
+            return {color: "#ce69db", weight: 1.5, opacity: 0.3}
           } else {
-            return {color: "#000000", weight: 1.5, opacity: 0.5}
+            return {color: "#000000", weight: 1.5, opacity: 0.3}
           }
         }
 
