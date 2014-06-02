@@ -36,7 +36,7 @@
                 results = regex.exec(location.search);
             return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
-        var headway_key = get_qs('headway') || 'headway_median';
+        var headway_key = get_qs('headway') || 'headway_peak';
     
         // Color gradient
         var colormap = d3.scale.linear().domain([0,0.3]).range(['white','blue'])
