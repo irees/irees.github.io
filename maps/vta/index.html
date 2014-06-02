@@ -34,32 +34,54 @@
       }
 
       function style(feature) {
-        var headway = feature.properties.headway_min;
-        var hide = {color: '#000000', opacity: 0.0}
-        if (feature.properties.trip_count < 10) {
-          return hide;
+        var headway = feature.properties.headway_median;
+        if (feature.properties.trip_count < 5) {
+          return {opacity: 0.0}
         }
         if (headway <= 1000) {
-          return {color: "#0011ff"}
-        } else if (headway <= 4000) {
-          return {color: "#ce69db", opacity: 0.2}
+          return {color: "#0011ff", weight: 3.0, opacity: 1.0}
+        } else if (headway <= 2000) {
+          return {color: "#ce69db", weight: 1.0, opacity: 0.5}
         } else {
-          return hide
+          return {color: "#000000", weight: 1.0, opacity: 0.5}
         }
       }
 
+      var style_vta_stops = {
+          radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+      };
+      
       function style_caltrain(feature) {
-        return {color: '#ffbb00'}
+        return {color: '#ffbb00', weight: 5.0, opacity: 1.0}
       }
 
       function style_bart(feature) {
-        return {color: '#ff3c00'}
+        return {color: '#ff3c00', weight: 5.0, opacity: 1.0}
       }
 
-      var jsonTest = new L.GeoJSON.AJAX(["vta.geojson"],{style:style, onEachFeature:popUp}).addTo(map);
-      var jsonTest = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
-      var jsonTest = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
-      console.log(jsonTest);
+      function style_bart_extension(feature) {
+        return {color: '#ff3c00', dashArray: '3,3'}
+      }
+
+      var j = new L.GeoJSON.AJAX(["vta.geojson"],{style:style, onEachFeature:popUp}).addTo(map);
+
+      var j = new L.GeoJSON.AJAX(["vta-stops.geojson"],{
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, style_vta_stops);
+        },
+        onEachFeature: popUp
+      }).addTo(map);
+
+      var j = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
+
+      var j = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
+
+      var j = new L.GeoJSON.AJAX(["bart-extension.geojson"],{style:style_bart_extension, onEachFeature:popUp}).addTo(map);
     </script>
   </body>
 </html>
