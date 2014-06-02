@@ -16,9 +16,13 @@
         text-indent: 0px;
       }
     </style>
+    
     <link href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" rel="stylesheet" />
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js" type="text/javascript"></script>
     <script src="leaflet.ajax.min.js" type="text/javascript"></script>
+
     <title>VTA</title>
     </head>
     <body>
@@ -26,6 +30,9 @@
       <div id="map"></div>
       <script type="text/javascript">
     
+        // Color gradient
+        var colormap = d3.scale.linear().domain([0,0.3]).range(['white','blue'])
+      
         // Setup the map.
         var map = L.map('map').setView([37.3475, -121.8040], 11);
         L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
@@ -33,7 +40,17 @@
         	id: 'examples.map-20v6611k'
         }).addTo(map);
 
-        function popUp(f,l){
+        function popup(f,l){
+            var out = [];
+            if (f.properties){
+                for(key in f.properties){
+                    out.push(key+": "+f.properties[key]);
+                }
+                l.bindPopup(out.join("<br />"));
+            }
+        }
+
+        function popup_route(f,l){
             var out = [];
             out.push('<h2>'+f.properties.name+'</h2>');
             if (f.properties.headways) {
@@ -87,24 +104,34 @@
           return {color: '#ff3c00', dashArray: '10', opacity: 1.0}
         }
 
+        function style_demo(feature) {
+            return {
+                fillColor: colormap(feature.properties.transit_pct),
+                weight: 0.0,
+                opacity: 0.0,
+                color: 'white',
+                fillOpacity: 0.5
+            };
+        }
+        
         // The individual layers.
         var layers = {};
-        layers['VTA'] = new L.GeoJSON.AJAX(["vta.geojson"],{style:style_vta, onEachFeature:popUp}).addTo(map);
+        layers['VTA'] = new L.GeoJSON.AJAX(["vta.geojson"],{style:style_vta, onEachFeature:popup_route}).addTo(map);
 
         layers['VTA Stops'] = new L.GeoJSON.AJAX(["vta_stops.geojson"],{
           pointToLayer: function (feature, latlng) {
               return L.circleMarker(latlng, style_vta_stops);
           },
-          onEachFeature: popUp
+          onEachFeature: popup_route
         }); //.addTo(map);
 
-        layers['Caltrain'] = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
+        layers['Caltrain'] = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popup_route}).addTo(map);
 
-        layers['BART'] = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
+        layers['BART'] = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popup_route}).addTo(map);
 
-        layers['BART Extension'] = new L.GeoJSON.AJAX(["bart_extension.geojson"],{style:style_bart_extension, onEachFeature:popUp}).addTo(map);
+        layers['BART Extension'] = new L.GeoJSON.AJAX(["bart_extension.geojson"],{style:style_bart_extension, onEachFeature:popup_route}).addTo(map);
 
-        
+        layers['Transit usage'] = new L.GeoJSON.AJAX(["tract_2012.geojson"],{style:style_demo, onEachFeature:popup}) //.addTo(map);
 
         // Setup the layer toggles.
         L.control.layers([], layers, {'collapsed':false}).addTo(map);
