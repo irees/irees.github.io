@@ -61,11 +61,6 @@
               out.push('</ul>');
             }
             l.bindPopup(out.join(""));
-            // if (f.properties){
-            //     for(key in f.properties){
-            //         out.push(key+": "+f.properties[key]);
-            //     }
-            // }
         }
 
         // GeoJSON Leaflet styles.
@@ -118,7 +113,7 @@
         var layers = {};
         layers['VTA'] = new L.GeoJSON.AJAX(["vta.geojson"],{style:style_vta, onEachFeature:popup_route}).addTo(map);
 
-        layers['VTA Stops'] = new L.GeoJSON.AJAX(["vta_stops.geojson"],{
+        layers['VTA Top 100 Stops'] = new L.GeoJSON.AJAX(["vta_stops.geojson"],{
           pointToLayer: function (feature, latlng) {
               return L.circleMarker(latlng, style_vta_stops);
           },
