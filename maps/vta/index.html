@@ -8,6 +8,13 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0;}
       #map{ height: 100% }
+      .vta-popup ul {
+        padding: 0px;
+      }
+      .vta-popup li {
+        padding: 0px;
+        text-indent: 0px;
+      }
     </style>
     <link href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" rel="stylesheet" />
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js" type="text/javascript"></script>
@@ -15,73 +22,94 @@
     <title>VTA</title>
     </head>
     <body>
-    <div id="map"></div>
-    <script type="text/javascript">
-      var map = L.map('map').setView([37.3475, -121.8040], 11);
-      L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-      	maxZoom: 18,
-      	id: 'examples.map-20v6611k'
-      }).addTo(map);
-
-      function popUp(f,l){
-          var out = [];
-          if (f.properties){
-              for(key in f.properties){
-                  out.push(key+": "+f.properties[key]);
-              }
-              l.bindPopup(out.join("<br />"));
-          }
-      }
-
-      function style(feature) {
-        var headway = feature.properties.headway_median;
-        if (feature.properties.trip_count < 5) {
-          return {opacity: 0.0}
-        }
-        if (headway <= 1000) {
-          return {color: "#0011ff", weight: 3.0, opacity: 1.0}
-        } else if (headway <= 2000) {
-          return {color: "#ce69db", weight: 1.0, opacity: 0.5}
-        } else {
-          return {color: "#000000", weight: 1.0, opacity: 0.5}
-        }
-      }
-
-      var style_vta_stops = {
-          radius: 8,
-          fillColor: "#ff7800",
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-      };
       
-      function style_caltrain(feature) {
-        return {color: '#ffbb00', weight: 5.0, opacity: 1.0}
-      }
+      <div id="map"></div>
+      <script type="text/javascript">
+    
+        // Setup the map.
+        var map = L.map('map').setView([37.3475, -121.8040], 11);
+        L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+        	maxZoom: 18,
+        	id: 'examples.map-20v6611k'
+        }).addTo(map);
 
-      function style_bart(feature) {
-        return {color: '#ff3c00', weight: 5.0, opacity: 1.0}
-      }
+        function popUp(f,l){
+            var out = [];
+            out.push('<h2>'+f.properties.name+'</h2>');
+            if (f.properties.headways) {
+              out.push('<ul class="vta-popup">');
+              out.push('<li>Route: '+(f.properties.route_id)+'</li>');
+              out.push('<li>Typical frequency: '+(f.properties.headway_median/60)+' mins</li>');
+              out.push('<li>Daily trips: '+f.properties.trip_count+'</li>');
+              out.push('</ul>');
+            }
+            l.bindPopup(out.join(""));
+            // if (f.properties){
+            //     for(key in f.properties){
+            //         out.push(key+": "+f.properties[key]);
+            //     }
+            // }
+        }
 
-      function style_bart_extension(feature) {
-        return {color: '#ff3c00', dashArray: '3,3'}
-      }
+        // GeoJSON Leaflet styles.
+        function style_vta(feature) {
+          var headway = feature.properties.headway_median;
+          if (feature.properties.trip_count < 5) {
+            return {opacity: 0.0}
+          }
+          if (headway <= 1000) {
+            return {color: "#0011ff", weight: 3.0, opacity: 1.0}
+          } else if (headway <= 2000) {
+            return {color: "#ce69db", weight: 1.0, opacity: 0.5}
+          } else {
+            return {color: "#000000", weight: 1.0, opacity: 0.5}
+          }
+        }
 
-      var j = new L.GeoJSON.AJAX(["vta.geojson"],{style:style, onEachFeature:popUp}).addTo(map);
+        var style_vta_stops = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+      
+        function style_caltrain(feature) {
+          return {color: '#ffbb00', weight: 5.0, opacity: 1.0}
+        }
 
-      var j = new L.GeoJSON.AJAX(["vta-stops.geojson"],{
-        pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, style_vta_stops);
-        },
-        onEachFeature: popUp
-      }).addTo(map);
+        function style_bart(feature) {
+          return {color: '#ff3c00', weight: 5.0, opacity: 1.0}
+        }
 
-      var j = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
+        function style_bart_extension(feature) {
+          return {color: '#ff3c00', dashArray: '10', opacity: 1.0}
+        }
 
-      var j = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
+        // The individual layers.
+        var layers = {};
+        layers['VTA'] = new L.GeoJSON.AJAX(["vta.geojson"],{style:style_vta, onEachFeature:popUp}).addTo(map);
 
-      var j = new L.GeoJSON.AJAX(["bart-extension.geojson"],{style:style_bart_extension, onEachFeature:popUp}).addTo(map);
+        layers['VTA Stops'] = new L.GeoJSON.AJAX(["vta_stops.geojson"],{
+          pointToLayer: function (feature, latlng) {
+              return L.circleMarker(latlng, style_vta_stops);
+          },
+          onEachFeature: popUp
+        }); //.addTo(map);
+
+        layers['Caltrain'] = new L.GeoJSON.AJAX(["caltrain.geojson"],{style:style_caltrain, onEachFeature:popUp}).addTo(map);
+
+        layers['BART'] = new L.GeoJSON.AJAX(["bart.geojson"],{style:style_bart, onEachFeature:popUp}).addTo(map);
+
+        layers['BART Extension'] = new L.GeoJSON.AJAX(["bart_extension.geojson"],{style:style_bart_extension, onEachFeature:popUp}).addTo(map);
+
+        
+
+        // Setup the layer toggles.
+        L.control.layers([], layers, {'collapsed':false}).addTo(map);
+
+
     </script>
   </body>
 </html>
