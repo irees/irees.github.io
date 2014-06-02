@@ -30,6 +30,14 @@
       <div id="map"></div>
       <script type="text/javascript">
     
+        function get_qs(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+        var headway_key = get_qs('headway') || 'headway_peak';
+    
         // Color gradient
         var colormap = d3.scale.linear().domain([0,0.3]).range(['white','blue'])
       
@@ -49,14 +57,15 @@
                 l.bindPopup(out.join("<br />"));
             }
         }
-
+        
         function popup_route(f,l){
             var out = [];
             out.push('<h2>'+f.properties.name+'</h2>');
             if (f.properties.headways) {
               out.push('<ul class="vta-popup">');
               out.push('<li>Route: '+(f.properties.route_id)+'</li>');
-              out.push('<li>Typical frequency: '+(f.properties.headway_median/60)+' mins</li>');
+              out.push('<li>Peak frequency: '+(f.properties.headway_peak/60)+' mins</li>');
+              out.push('<li>Median frequency: '+(f.properties.headway_median/60)+' mins</li>');
               out.push('<li>Daily trips: '+f.properties.trip_count+'</li>');
               out.push('</ul>');
             }
@@ -65,16 +74,17 @@
 
         // GeoJSON Leaflet styles.
         function style_vta(feature) {
-          var headway = feature.properties.headway_median;
+          console.log(headway_key);
+          var headway = feature.properties[headway_key];
           if (feature.properties.trip_count < 5) {
             return {opacity: 0.0}
           }
-          if (headway <= 1000) {
-            return {color: "#0011ff", weight: 3.0, opacity: 1.0}
-          } else if (headway <= 2000) {
-            return {color: "#ce69db", weight: 1.0, opacity: 0.5}
+          if (headway <= 900) {
+            return {color: "#0011ff", weight: 2.5, opacity: 1.0}
+          } else if (headway < 2000) {
+            return {color: "#ce69db", weight: 2.5, opacity: 0.5}
           } else {
-            return {color: "#000000", weight: 1.0, opacity: 0.5}
+            return {color: "#000000", weight: 1.5, opacity: 0.5}
           }
         }
 
