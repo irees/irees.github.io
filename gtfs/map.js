@@ -36,6 +36,8 @@ function gtfsControl(element, map) {
 gtfsControl.prototype.build = function() {
   var self = this;
   this.element.empty();
+  $('<div style="text-align:center">UNDER DEVELOPMENT</div>').appendTo(this.element);
+  
   var los = $('<div />')
     .text('Period to calculate LOS')
     .addClass('cityism-transvisor-loscontrol')
