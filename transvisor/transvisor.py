@@ -66,37 +66,12 @@ def stopinfo(stop, sched=None):
   f = s.as_geo()
   yield f
   
-def routeinfo2(route, sched=None, planner=False):
-  print "\n===== Route %s: %s ====="%(route.route_short_name, route.route_long_name)
-  
-  # Filter by Monday service for now...
-  trips = filter(lambda x:getattr(x.service, 'monday', None), route.trips)
-  
-  # Group by by direction_id, then analyze stops...
-  trips = filter(lambda x:getattr(x, 'direction_id', 0)==1, trips)
-  common = collections.defaultdict(list)
-  for trip in trips:
-    trip.stop_times = sorted(trip.stop_times, key=lambda x:x.stop_sequence)
-    stopseq = tuple(stop.stop_id for stop in trip.stop_times)
-    common[stopseq].append(trip)
-    # for stop in trip.stop_times:
-    #   common[stop.stop_id].append(trip)
-
-  print "Trips?", len(trips)
-  for k,v in sorted(common.items(), key=lambda x:len(x[1])):
-    print k
-    print "\t", len(v), set([i.shape_id for i in v])
-  
-
-
-  return []
-  
 def routeinfo(route, sched=None, planner=False):
   print "\n===== Route %s: %s ====="%(route.route_short_name, route.route_long_name)
   
   # Filter by Monday service for now...
   trips = filter(lambda x:getattr(x.service, 'monday', None), route.trips)
-  
+    
   # Find each route by the sequence of stops...
   unfurled = {}
   for trip in trips:
@@ -110,8 +85,8 @@ def routeinfo(route, sched=None, planner=False):
 
   for key,trips in unfurled.items():
     trips = sorted(trips, key=lambda trip:(trip.stop_times[0].arrival_time.seconds))
-    # print "----- Route Group -----"
-    # print key
+    print "----- Route Group -----"
+    print key
     test_shape_id = set([trip.shape_id for trip in trips])
     test_headsign = set([trip.trip_headsign for trip in trips])
     test_times = [str(trip.stop_times[0].arrival_time) for trip in trips]
@@ -141,7 +116,7 @@ def routeinfo(route, sched=None, planner=False):
     r['trip_headsign'] = trips[0].trip_headsign
     r['direction_id'] = trips[0].direction_id
     r['trip_starts'] = [trip.stop_times[0].arrival_time.seconds for trip in trips]
-    # print r
+    print r
     yield route_as_geo(route=route, trips=trips, info=r, sched=sched, planner=planner)
 
     
@@ -175,9 +150,8 @@ if __name__ == "__main__":
   c = FeatureCollection()
   
   # Calculate route stats and add to collection
-  print "Routes:", routes
   for route in routes:
-    for f in routeinfo2(route, sched=sched, planner=args.planner):
+    for f in routeinfo(route, sched=sched, planner=args.planner):
       c.addfeature(f)
 
   # Get the stops
@@ -189,5 +163,5 @@ if __name__ == "__main__":
   # Write the geojson output.
   if args.output:
     with open(output, "w") as f:
-      f.write(c.dump())
+      print f.write(c.dump())
     

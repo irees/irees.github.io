@@ -2,14 +2,23 @@
 /***** Utility functions *****/
 
 // Colors: colorbrewer2.org
+// var colors = [
+//   '#d73027',
+//   '#fc8d59',
+//   '#fee090',
+//   '#e0f3f8',
+//   '#91bfdb',
+//   '#4575b4'
+// ].reverse();
 var colors = [
-  '#d73027', 
-  '#fc8d59', 
-  '#fee090', 
-  '#e0f3f8', 
-  '#91bfdb', 
-  '#4575b4'
-].reverse();
+'#eff3ff',
+'#c6dbef',
+'#9ecae1',
+'#6baed6',
+'#3182bd',
+'#08519c',
+].reverse()
+
 
 // Level of Service definitions.
 var LOS = [{
@@ -194,9 +203,8 @@ var TripView = Backbone.View.extend({
     )
   },
   toggle: function(e) {
-    e.stopPropagation();
-    var display = this.$('.transvisor-trip-toggle').prop('checked');
-    this.model.set('display', display)
+    e.preventDefault();
+    this.model.set('display', !this.model.get('display'))
   }  
 });
 
@@ -266,7 +274,7 @@ var RouteView = Backbone.View.extend({
     var view = new TripView({model: trip});
     // Add to the inbound or outbound list.
     var el = this.$(".transvisor-route-inbound");
-    if (trip.get('properties').direction_id == 0) {
+    if (trip.get('properties').direction_id == 1) {
       var el = this.$(".transvisor-route-outbound");      
     }
     el.append(view.render().el);
@@ -274,6 +282,7 @@ var RouteView = Backbone.View.extend({
   // 
   check_display: function() {
     // Update the Route checkbox, depending on the state of the Trips.
+    console.log("check_display");
     var display = this.collection.filter(function(trip){
       return trip.get('display')
     });
