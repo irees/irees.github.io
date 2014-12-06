@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name":"Moffett Field"},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.02948093414305,
+          37.40780092202727
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name":"Google"},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.08423018455504,
+          37.422104164585015
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name":"Apple Campus 2"},
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.00980424880981,
+          37.3332793787758
+        ]
+      }
+    }
+  ]
+}
